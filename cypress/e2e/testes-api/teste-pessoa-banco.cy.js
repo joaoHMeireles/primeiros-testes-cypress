@@ -10,17 +10,21 @@ describe("Consultar, criar, editar e deletar Pessoa", () => {
         senha: "123",
         genero: "MASCULINO"
     }
-    let quantidadePessoa = 0
+    let quantidadePessoas = 0
 
-    //pega o valor do tamanho da lista
+
+    //REQUISIÇÕES GET
+
+
+    //pega o valor do tamanho da list
     it('consultar pessoas do banco', () => {
         cy.request("GET", urlPessoa).as("TodoRequest")
         cy.get("@TodoRequest").then(response => {
-            quantidadePessoa = response.body.length
+            quantidadePessoas = response.body.length
             expect(response.body[0]).to.have.property('cpf')
         })
     })
-    
+
     it('consultar pessoa por email', () => {
         cy.request("GET", urlPessoa + "/email/joao@gmail.com").as("TodoRequest")
         cy.get("@TodoRequest").then(response => {
@@ -49,6 +53,10 @@ describe("Consultar, criar, editar e deletar Pessoa", () => {
         })
     })
 
+
+    //REQUISIÇÕES POST
+
+
     it('cadastrar pessoa nova', () => {
         cy.request("POST", urlPessoa + "/1", pessoaNova).as("TodoRequest")
         cy.get("@TodoRequest").then(response => {
@@ -56,14 +64,14 @@ describe("Consultar, criar, editar e deletar Pessoa", () => {
         })
     })
 
-    it('cadastrar pessoa que tem um cpf que já existe no banco', () => {
+    it('cadastrar pessoa com um cpf que já existe no banco', () => {
         cy.request("POST", urlPessoa + "/1", pessoaNova).as("TodoRequest")
         cy.get("@TodoRequest").then(response => {
             expect(response.body).to.eq("Este CPF já está cadastrado")
         })
     })
 
-    it('cadastrar pessoa que tem um email que já existe no banco', () => {
+    it('cadastrar pessoa com um email que já existe no banco', () => {
         pessoaNova.cpf = 127
 
         cy.request("POST", urlPessoa + "/1", pessoaNova).as("TodoRequest")
@@ -72,7 +80,74 @@ describe("Consultar, criar, editar e deletar Pessoa", () => {
         })
     })
 
+    
+    it('cadastrar pessoa com o nome em branco', () => {
+        pessoaNova.nome = ""
+
+        cy.on('fail', () => {
+            console.log("Tudo certo");
+        })
+
+        cy.request("POST", urlPessoa + "/1", pessoaNova).as("TodoRequest")
+        cy.get("@TodoRequest").then(() => {
+            expect(1).to.eq(0)
+        })
+    })
+
+    it('cadastrar pessoa com o sobrenome em branco', () => {
+        pessoaNova.nome = "Otávio"
+        pessoaNova.sobrenome = ""
+
+        cy.on('fail', () => {
+            console.log("Tudo certo");
+        })
+
+        cy.request("POST", urlPessoa + "/1", pessoaNova).as("TodoRequest")
+        cy.get("@TodoRequest").then(() => {
+            expect(1).to.eq(0)
+        })
+    })
+
+    it('cadastrar pessoa com a senha em branco', () => {
+        pessoaNova.sobrenome = "Augusto"
+        pessoaNova.senha = ""
+
+        cy.on('fail', () => {
+            console.log("Tudo certo");
+        })
+
+
+        cy.request("POST", urlPessoa + "/1", pessoaNova).as("TodoRequest")
+        cy.get("@TodoRequest").then(() => {
+            expect(1).to.eq(0)
+        })
+    })
+
+
+
+    it('cadastrar pessoa com um email inválido', () => {
+        pessoaNova.senha = "123"
+        pessoaNova.email = "otavioA.com"
+
+        cy.on('fail', () => {
+            console.log("Tudo certo");
+        })
+
+
+        cy.request("POST", urlPessoa + "/1", pessoaNova).as("TodoRequest")
+        cy.get("@TodoRequest").then(() => {
+            expect(1).to.eq(0)
+        })
+    })
+
+
+
+
+    //REQUISIÇÕES PUT
+
+
     it('atualizar pessoa', () => {
+        pessoaNova.email = "otavio.A@gmail.com"
         pessoaNova.cpf = 126
         pessoaNova.genero = "OUTRO"
 
@@ -89,7 +164,10 @@ describe("Consultar, criar, editar e deletar Pessoa", () => {
         })
     })
 
-    //uso prA VERIFICAR O TAMANHO
+
+    //REQUISIÇÕES DELETE
+
+    
     it('deletar pessoa', () => {
         cy.request("DELETE", urlPessoa + "/126").as("TodoRequest")
         cy.get("@TodoRequest").then(response => {
@@ -98,7 +176,7 @@ describe("Consultar, criar, editar e deletar Pessoa", () => {
 
         cy.request("GET", urlPessoa).as("SecondaryRequest")
         cy.get("@SecondaryRequest").then(response => {
-            expect(response.body.length).to.eq(quantidadePessoa)
+            expect(response.body.length).to.eq(quantidadePessoas)
         })
     })
 
