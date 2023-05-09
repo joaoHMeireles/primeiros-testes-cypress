@@ -186,4 +186,15 @@ describe("Consultar, criar, editar e deletar Pessoa", () => {
             expect(response.body).to.eq("Não foi encontrada nenhuma pessoa com este CPF")
         })
     })
+
+
+    // let token = ""
+
+    // it(''. () => {
+    //     cy.request("")
+    //     cy.get("").then((resp) => {
+    //         token = resp.
+    //     })
+    // })
 })
+
